@@ -16,5 +16,26 @@ CHIP DMux8Way {
     OUT a, b, c, d, e, f, g, h;
 
     PARTS:
-    // Put your code here:
+
+    DMux(in = in, sel = sel[2], a = inABCD, b = inEFGH);
+    DMux4Way(in = inABCD, sel = sel[0..1], a = a, b = b, c = c, d = d);
+    DMux4Way(in = inEFGH, sel = sel[0..1], a = e, b = f, c = g, d = h);
+
+    // First attempt solution
+    /*
+    Not(in = sel[2], out = notSel2);
+    And(a = in, b = notSel2, out = inABCD);
+    And(a = in, b =  sel[2], out = inEFGH);
+
+    Not(in = sel[1], out = notSel1);
+    And(a = inABCD, b = notSel1, out = inAB);
+    And(a = inABCD, b =  sel[1], out = inCD);
+    And(a = inEFGH, b = notSel1, out = inEF);
+    And(a = inEFGH, b =  sel[1], out = inGH);
+
+    DMux(in = inAB, sel = sel[0], a = a, b = b);
+    DMux(in = inCD, sel = sel[0], a = c, b = d);
+    DMux(in = inEF, sel = sel[0], a = e, b = f);
+    DMux(in = inGH, sel = sel[0], a = g, b = h);
+    */
 }
