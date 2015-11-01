@@ -16,5 +16,109 @@ CHIP Mux4Way16 {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+
+    // Alternate simplier but more expensive in terms of gates solution.
+    //
+    // Mux16(a = a, b = b, sel = sel[0], out = selAB);
+    // Mux16(a = c, b = d, sel = sel[0], out = selCD);
+    // Mux16(a = selAB, b = selCD, sel = sel[1], out = out);
+    //
+    // 3 Mux = 4 Not, 8 And16, 4 Or16
+    // vs
+    // 2 Not, 4 And, 4 And16, 3 Or16
+
+    Not(in = sel[0], out = notSel0);
+    Not(in = sel[1], out = notSel1);
+    And(a = notSel1, b = notSel0, out = selA);
+    And(a = notSel1, b =  sel[0], out = selB);
+    And(a =  sel[1], b = notSel0, out = selC);
+    And(a =  sel[1], b =  sel[0], out = selD);
+
+    And16(
+      a = a,
+      b[0] = selA,
+      b[1] = selA,
+      b[2] = selA,
+      b[3] = selA,
+      b[4] = selA,
+      b[5] = selA,
+      b[6] = selA,
+      b[7] = selA,
+      b[8] = selA,
+      b[9] = selA,
+      b[10] = selA,
+      b[11] = selA,
+      b[12] = selA,
+      b[13] = selA,
+      b[14] = selA,
+      b[15] = selA,
+      out = a-and-selA
+    );
+
+    And16(
+      a = b,
+      b[0] = selB,
+      b[1] = selB,
+      b[2] = selB,
+      b[3] = selB,
+      b[4] = selB,
+      b[5] = selB,
+      b[6] = selB,
+      b[7] = selB,
+      b[8] = selB,
+      b[9] = selB,
+      b[10] = selB,
+      b[11] = selB,
+      b[12] = selB,
+      b[13] = selB,
+      b[14] = selB,
+      b[15] = selB,
+      out = b-and-selB
+    );
+
+    And16(
+      a = c,
+      b[0] = selC,
+      b[1] = selC,
+      b[2] = selC,
+      b[3] = selC,
+      b[4] = selC,
+      b[5] = selC,
+      b[6] = selC,
+      b[7] = selC,
+      b[8] = selC,
+      b[9] = selC,
+      b[10] = selC,
+      b[11] = selC,
+      b[12] = selC,
+      b[13] = selC,
+      b[14] = selC,
+      b[15] = selC,
+      out = c-and-selC
+    );
+
+    And16(
+      a = d,
+      b[0] = selD,
+      b[1] = selD,
+      b[2] = selD,
+      b[3] = selD,
+      b[4] = selD,
+      b[5] = selD,
+      b[6] = selD,
+      b[7] = selD,
+      b[8] = selD,
+      b[9] = selD,
+      b[10] = selD,
+      b[11] = selD,
+      b[12] = selD,
+      b[13] = selD,
+      b[14] = selD,
+      b[15] = selD,
+      out = d-and-selD
+    );
+
+    Or16(a = a-and-selA, b = b-and-selB, out = ab);
+    Or16(a = c-and-selC, b = d-and-selD, out = cd);
+    Or16(a = ab, b = cd, out = out);
 }
