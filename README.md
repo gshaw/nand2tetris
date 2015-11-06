@@ -1,5 +1,3 @@
 # Nand2Tetris
 
-My solutions for the Nand2Tetris courses and The Elements of Computing Systems.
-
-http://nand2tetris.org
+My solutions for the http://nand2tetris.org course.
