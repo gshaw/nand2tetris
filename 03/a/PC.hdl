@@ -11,10 +11,44 @@
  * else                    out[t+1] = out[t]
  */
 
+/*
+
+reset load inc | sel  | registerIn
+0     0    0   | c 10 | registerOut
+0     0    1   | d 11 | outPlus1
+0     1    0   | b 01 | in (b)
+0     1    1   | b 01 | in (b)
+1     0    0   | a 00 | false
+1     0    1   | a 00 | false
+1     1    0   | a 00 | false
+1     1    1   | a 00 | false
+
+sel[1] = !reset & !load = !(reset | load)
+sel[0] = !reset & (inc | load)
+
+*/
+
 CHIP PC {
     IN in[16],load,inc,reset;
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    Or(a = reset, b = load, out = resetOrLoad);
+    Not(in = resetOrLoad, out = sel1);
+    Not(in = reset, out = notReset);
+    Or(a = inc, b = load, out = incOrLoad);
+    And(a = incOrLoad, b = notReset, out = sel0);
+
+    Inc16(in = registerOut, out = outPlus1);
+
+    Mux4Way16(
+      sel[0] = sel0,
+      sel[1] = sel1,
+      a = false,
+      b = in,
+      c = registerOut,
+      d = outPlus1,
+      out = registerIn
+    );
+    Register(in = registerIn, out = registerOut, out = out, load = true);
 }
