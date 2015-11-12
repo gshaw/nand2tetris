@@ -10,15 +10,9 @@ class Parser
     !input.eof?
   end
 
-  # Reads the next command from the input and makes it the current command.
-  # Should be calld only if more_commands? is true.  Initially there is no
-  # current command.
+  # Advance current_line to next non-blank line or until EOF.
   def advance
-    loop do
-      break unless has_more_commands?
-      @current_line = input.readline.strip.gsub(COMMENT_PATTERN, "").strip
-      break unless current_line == ""
-    end
+    @current_line = input.readline.strip.gsub(COMMENT_PATTERN, "").strip
   end
 
   COMMENT_PATTERN = %r{//.*\z}
@@ -41,6 +35,7 @@ class Parser
   C_PATTERN = /\A((?<dest>#{DEST_PATTERN})\s*=\s*)?((?<comp>(#{COMP_A0_PATTERN})|(#{COMP_A1_PATTERN})))(\s*;\s*(?<jump>#{JUMP_PATTERN}))?\z/
 
   def command_type
+    return nil if current_line.empty?
     @current_match = A_PATTERN.match(current_line) and return :a_command
     @current_match = C_PATTERN.match(current_line) and return :c_command
     @current_match = L_PATTERN.match(current_line) and return :l_command

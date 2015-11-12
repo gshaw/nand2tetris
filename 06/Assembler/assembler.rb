@@ -22,6 +22,7 @@ class Assembler
     parser = Parser.new(input)
     while parser.has_more_commands?
       parser.advance
+
       case parser.command_type
       when :a_command, :c_command
         rom_address += 1
@@ -61,9 +62,6 @@ class Assembler
         dest = code.dest(parser.dest)
         jump = code.jump(parser.jump)
         output.puts "111#{comp}#{dest}#{jump}"
-
-      when :l_command
-        # ignore
       end
     end
   end
