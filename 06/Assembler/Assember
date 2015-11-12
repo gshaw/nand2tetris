@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative 'assembler'
+
+Assembler.new.assemble(ARGV[0])
