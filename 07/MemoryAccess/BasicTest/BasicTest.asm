@@ -167,7 +167,7 @@
       @SP
       M=M+1
 
-      @SP // binary operation M+D
+      @SP // add
       D=M
       AM=D-1
       D=M
@@ -185,7 +185,7 @@
       @SP
       M=M+1
 
-      @SP // binary operation M-D
+      @SP // sub
       D=M
       AM=D-1
       D=M
@@ -214,14 +214,14 @@
       @SP
       M=M+1
 
-      @SP // binary operation M+D
+      @SP // add
       D=M
       AM=D-1
       D=M
       A=A-1
       M=M+D
 
-      @SP // binary operation M-D
+      @SP // sub
       D=M
       AM=D-1
       D=M
@@ -239,7 +239,7 @@
       @SP
       M=M+1
 
-      @SP // binary operation M+D
+      @SP // add
       D=M
       AM=D-1
       D=M

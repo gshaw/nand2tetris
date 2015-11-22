@@ -14,7 +14,7 @@
       @SP
       M=M+1
 
-      @SP // binary operation M+D
+      @SP // add
       D=M
       AM=D-1
       D=M

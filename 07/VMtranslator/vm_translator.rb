@@ -2,18 +2,18 @@ require_relative "parser"
 require_relative "code_writer"
 
 class VMTranslator
-  def translate(input_path)
+  def translate(input_path, bootstrap: true)
     if File.file?(input_path)
       translate_file(input_path)
     else
-      translate_directory(input_path)
+      translate_directory(input_path, bootstrap: bootstrap)
     end
   end
 
-  def translate_directory(directory_path)
+  def translate_directory(directory_path, bootstrap: true)
     output_path = "#{directory_path}/#{File.basename(directory_path)}.asm"
     code_writer = CodeWriter.new(output_path)
-    code_writer.write_init
+    code_writer.write_init if bootstrap
     Dir.glob("#{directory_path}/*.vm").each do |input_path|
       generate(input_path, code_writer)
     end
@@ -21,10 +21,10 @@ class VMTranslator
     output_path
   end
 
+  # Assemble single .vm module, does not output bootstrap code
   def translate_file(input_path)
     output_path = input_path.gsub(/.vm\z/i, ".asm")
     code_writer = CodeWriter.new(output_path)
-    code_writer.write_init
     generate(input_path, code_writer)
     code_writer.close
     output_path

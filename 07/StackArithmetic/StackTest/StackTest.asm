@@ -14,7 +14,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JEQ
+      @SP // eq
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -47,7 +47,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JEQ
+      @SP // eq
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -80,7 +80,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JEQ
+      @SP // eq
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -113,7 +113,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JLT
+      @SP // lt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -146,7 +146,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JLT
+      @SP // lt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -179,7 +179,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JLT
+      @SP // lt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -212,7 +212,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JGT
+      @SP // gt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -245,7 +245,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JGT
+      @SP // gt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -278,7 +278,7 @@
       @SP
       M=M+1
 
-      @SP // conditional JGT
+      @SP // gt
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
@@ -319,7 +319,7 @@
       @SP
       M=M+1
 
-      @SP // binary operation M+D
+      @SP // add
       D=M
       AM=D-1
       D=M
@@ -334,18 +334,18 @@
       @SP
       M=M+1
 
-      @SP // binary operation M-D
+      @SP // sub
       D=M
       AM=D-1
       D=M
       A=A-1
       M=M-D
 
-      @SP // unary operation -M
+      @SP // neg
       A=M-1
       M=-M
 
-      @SP // binary operation M&D
+      @SP // and
       D=M
       AM=D-1
       D=M
@@ -360,14 +360,14 @@
       @SP
       M=M+1
 
-      @SP // binary operation M|D
+      @SP // or
       D=M
       AM=D-1
       D=M
       A=A-1
       M=M|D
 
-      @SP // unary operation !M
+      @SP // not
       A=M-1
       M=!M
 
