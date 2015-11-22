@@ -22,49 +22,25 @@
       @SP
       M=M+1
 
-      @8 // pop static 8
-      D=A // D = index
-      @StaticTest.8 // A = segment
-      D=A // D = segment pointer + index (address to write top of stack to)
-      @R13
-      M=D // R13 = address to write top of stack to
-      @SP // read top of stack into D
+      @SP // pop static 8
       AM=M-1 // dec SP
       D=M // top of stack into D
-      @R13 // write D (top of stack) to address in R13
-      A=M
+      @StaticTest.8 // write D (top of stack) to static address
       M=D
 
-      @3 // pop static 3
-      D=A // D = index
-      @StaticTest.3 // A = segment
-      D=A // D = segment pointer + index (address to write top of stack to)
-      @R13
-      M=D // R13 = address to write top of stack to
-      @SP // read top of stack into D
+      @SP // pop static 3
       AM=M-1 // dec SP
       D=M // top of stack into D
-      @R13 // write D (top of stack) to address in R13
-      A=M
+      @StaticTest.3 // write D (top of stack) to static address
       M=D
 
-      @1 // pop static 1
-      D=A // D = index
-      @StaticTest.1 // A = segment
-      D=A // D = segment pointer + index (address to write top of stack to)
-      @R13
-      M=D // R13 = address to write top of stack to
-      @SP // read top of stack into D
+      @SP // pop static 1
       AM=M-1 // dec SP
       D=M // top of stack into D
-      @R13 // write D (top of stack) to address in R13
-      A=M
+      @StaticTest.1 // write D (top of stack) to static address
       M=D
 
-      @3 // push static 3
-      D=A
-      @StaticTest.3
-      A=A
+      @StaticTest.3 // push static 3
       D=M
       @SP // push D on to stack
       A=M
@@ -72,10 +48,7 @@
       @SP
       M=M+1
 
-      @1 // push static 1
-      D=A
-      @StaticTest.1
-      A=A
+      @StaticTest.1 // push static 1
       D=M
       @SP // push D on to stack
       A=M
@@ -90,10 +63,7 @@
       A=A-1
       M=M-D
 
-      @8 // push static 8
-      D=A
-      @StaticTest.8
-      A=A
+      @StaticTest.8 // push static 8
       D=M
       @SP // push D on to stack
       A=M

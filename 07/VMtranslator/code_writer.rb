@@ -74,7 +74,7 @@ class CodeWriter
       push_constant_asm(index)
 
     when "static"
-      push_indirect_asm(segment, index, "A")
+      push_static_asm(index)
 
     when "pointer", "temp"
       push_indirect_asm(segment, index, "A+D")
@@ -97,11 +97,25 @@ class CodeWriter
     ASM
   end
 
+  def push_static_asm(index)
+    # push the value at segment[index] onto the stack
+    # stack[sp] = segment[index]
+    # sp += 1
+    <<-ASM
+      @#{segment_symbol("static", index)} // push static #{index}
+      D=M
+      @SP // push D on to stack
+      A=M
+      M=D
+      @SP
+      M=M+1
+    ASM
+  end
+
   def push_indirect_asm(segment, index, offset_calculation)
     # push the value at segment[index] onto the stack
     # stack[sp] = segment[index]
     # sp += 1
-    # TODO: optimize for static segment by removing first two opcodes
     <<-ASM
       @#{index} // push #{segment} #{index}
       D=A
@@ -119,7 +133,7 @@ class CodeWriter
   def pop_asm(segment, index)
     case segment
     when "static"
-      pop_indirect_asm(segment, index, "A")
+      pop_static_asm(index)
 
     when "pointer", "temp"
       pop_indirect_asm(segment, index, "A+D")
@@ -129,11 +143,20 @@ class CodeWriter
     end
   end
 
+  def pop_static_asm(index)
+    <<-ASM
+      @SP // pop static #{index}
+      AM=M-1 // dec SP
+      D=M // top of stack into D
+      @#{segment_symbol("static", index)} // write D (top of stack) to static address
+      M=D
+    ASM
+  end
+
   def pop_indirect_asm(segment, index, offset_calculation)
     # pop the top of the stack and store it in segment[index]
     # segment[index] = stack[sp]
     # sp -= 1
-    # TODO: optimize for static segment by removing first two opcodes
     <<-ASM
       @#{index} // pop #{segment} #{index}
       D=A // D = index
