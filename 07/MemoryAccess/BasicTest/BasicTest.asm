@@ -231,7 +231,7 @@
       @6 // push temp 6
       D=A
       @R5
-      A=M+D
+      A=A+D
       D=M
       @SP // push D on to stack
       A=M

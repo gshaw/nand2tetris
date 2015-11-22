@@ -19,8 +19,11 @@ class VMTranslator
       when :c_math
         code_writer.write_math(parser.command)
 
-      when :c_push, :c_pop
-        code_writer.write_push_pop(parser.command, parser.arg1, parser.arg2)
+      when :c_push
+        code_writer.write_push(parser.arg1, parser.arg2)
+
+      when :c_pop
+        code_writer.write_pop(parser.arg1, parser.arg2)
 
       when nil
         # ignore

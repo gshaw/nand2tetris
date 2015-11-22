@@ -14,7 +14,26 @@ class CodeWriter
   end
 
   def write_math(command)
-    write case command
+    write math_asm(command)
+  end
+
+  def write_push(segment, index)
+    write push_asm(segment, index)
+  end
+
+  def write_pop(segment, index)
+    write pop_asm(segment, index)
+  end
+
+  private
+
+  def write(asm)
+    output.puts(asm)
+    output.puts
+  end
+
+  def math_asm(command)
+    case command
     when "add" then binary_operation_asm("M+D")
     when "sub" then binary_operation_asm("M-D")
     when "and" then binary_operation_asm("M&D")
@@ -29,20 +48,6 @@ class CodeWriter
     else
       fail "Unknown math command: #{command}"
     end
-  end
-
-  def write_push_pop(command, segment, index)
-    write case command
-    when "push" then push_asm(segment, index)
-    when "pop"  then pop_asm(segment, index)
-    else
-      fail "Unknown push pop command: #{command}"
-    end
-  end
-
-  def write(asm)
-    output.puts(asm)
-    output.puts
   end
 
   def next_local_label
@@ -75,7 +80,7 @@ class CodeWriter
     when "constant"
       push_constant_asm(index)
 
-    when "temp"
+    when "pointer", "temp"
       push_indirect_asm(segment, index, "A+D")
 
     else
@@ -104,7 +109,7 @@ class CodeWriter
       @#{index} // push #{segment} #{index}
       D=A
       @#{segment_symbol(segment)}
-      A=M+D
+      A=#{offset_calculation}
       D=M
       @SP // push D on to stack
       A=M
@@ -115,8 +120,10 @@ class CodeWriter
   end
 
   def pop_asm(segment, index)
-    if segment == "temp"
+    case segment
+    when "pointer", "temp"
       pop_indirect_asm(segment, index, "A+D")
+
     else
       pop_indirect_asm(segment, index, "M+D")
     end
