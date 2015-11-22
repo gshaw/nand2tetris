@@ -43,7 +43,7 @@ class VMTranslator
         when :c_if       then code_writer.write_if(parser.arg1)
         when :c_function then code_writer.write_function(parser.arg1, parser.arg2)
         when :c_call     then code_writer.write_call(parser.arg1, parser.arg2)
-        when :c_return   then code_writer.write_return(parser.arg1, parser.arg2)
+        when :c_return   then code_writer.write_return
 
         when nil         then # ignore
         else

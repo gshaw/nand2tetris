@@ -12,6 +12,7 @@ assember_path = File.expand_path("../../06/Assembler/Assembler")
 
   File.expand_path("../../08/ProgramFlow/BasicLoop/BasicLoop.vm"),
   File.expand_path("../../08/ProgramFlow/FibonacciSeries/FibonacciSeries.vm"),
+  File.expand_path("../../08/FunctionCalls/SimpleFunction/SimpleFunction.vm"),
 
 ].each do |vm_path|
   puts vm_path

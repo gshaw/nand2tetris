@@ -1,10 +1,11 @@
 class CodeWriter
-  attr_reader :basename, :output
+  attr_reader :basename, :output, :function_name_stack
 
   def initialize(path)
     @basename = File.basename(path, ".asm")
     @output = File.open(path, "w")
     @local_label_count = 0
+    @function_name_stack = ["."]
   end
 
   def close
@@ -28,7 +29,7 @@ class CodeWriter
   end
 
   def write_label(label)
-    write "(#{qualified_label(label)})"
+    write "(#{label_specification(label)})"
   end
 
   def write_if(label)
@@ -39,6 +40,16 @@ class CodeWriter
     write goto_asm(label)
   end
 
+  def write_function(name, arg_count)
+    function_name_stack.push(name)
+    write function_asm(name, arg_count)
+  end
+
+  def write_return
+    write return_asm
+    function_name_stack.pop
+  end
+
   private
 
   def write(asm)
@@ -46,12 +57,96 @@ class CodeWriter
     output.puts
   end
 
-  def qualified_label(label)
-    ".$#{label}"
+  def label_specification(label)
+    "#{function_name_stack.last}$#{label}"
   end
 
   def init_asm
     "// init bootstrap goes here"
+  end
+
+  def function_asm(name, arg_count)
+    asm = <<-ASM
+(#{name}) // function #{name}
+      @0 // push constant 0
+      D=A
+    ASM
+    arg_count.to_i.times do |index|
+      asm << <<-ASM
+        @SP // arg #{index}
+        A=M
+        M=D
+        @SP
+        M=M+1
+      ASM
+    end
+    asm
+  end
+
+  def return_asm
+    <<-ASM
+      // FRAME = LCL (save FRAME in R13)
+        @LCL
+        D=M
+        @R13
+        M=D
+      // RET = *(FRAME-5) (save return address in R14)
+        @5
+        A=D-A // A = FRAME-5
+        D=M // D = *(FRAME-5)
+        @R14
+        M=D // R14 = RET
+      // *ARG = pop()
+        @SP
+        AM=M-1 // dec SP
+        D=M // top of stack into D
+        @ARG
+        A=M
+        M=D
+        @999
+        @999
+      // SP = ARG+1
+        @ARG
+        D=M+1
+        @SP
+        M=D
+      // THAT = *(FRAME-1)
+        @1
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @THAT
+        M=D
+      // THIS = *(FRAME-2)
+        @2
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @THIS
+        M=D
+      // ARG = *(FRAME-3)
+        @3
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @ARG
+        M=D
+      // LCL = *(FRAME-4)
+        @4
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @LCL
+        M=D
+      // goto RET
+        @R14
+        A=M
+        0;JMP
+    ASM
   end
 
   def if_asm(label)
@@ -63,14 +158,14 @@ class CodeWriter
       @SP // if-goto #{label}
       AM=M-1
       D=M // D = popped value from top of stack
-      @#{qualified_label(label)}
+      @#{label_specification(label)}
       D;JNE
     ASM
   end
 
   def goto_asm(label)
     <<-ASM
-      @#{qualified_label(label)} // goto #{label}
+      @#{label_specification(label)} // goto #{label}
       0;JMP
     ASM
   end
