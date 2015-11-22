@@ -1,11 +1,9 @@
 class CodeWriter
-  attr_accessor :static_count
   attr_reader :basename, :output
 
   def initialize(path)
-    @basename = File.basename(path, ".vm")
+    @basename = File.basename(path, ".asm")
     @output = File.open(path, "w")
-    @static_count = 0
     @local_label_count = 0
   end
 
@@ -56,7 +54,7 @@ class CodeWriter
     local_label
   end
 
-  def segment_symbol(segment)
+  def segment_symbol(segment, index)
     case segment
     when "argument" then "ARG"
     when "local"    then "LCL"
@@ -64,12 +62,7 @@ class CodeWriter
     when "that"     then "THAT"
     when "pointer"  then "R3"
     when "temp"     then "R5"
-
-    when "static"
-      address = "#{basename}.#{static_count}"
-      self.static_count += 1
-      address
-
+    when "static"   then "#{basename}.#{index}"
     else
       fail "Unknown segment #{segment}"
     end
@@ -79,6 +72,9 @@ class CodeWriter
     case segment
     when "constant"
       push_constant_asm(index)
+
+    when "static"
+      push_indirect_asm(segment, index, "A")
 
     when "pointer", "temp"
       push_indirect_asm(segment, index, "A+D")
@@ -105,10 +101,11 @@ class CodeWriter
     # push the value at segment[index] onto the stack
     # stack[sp] = segment[index]
     # sp += 1
+    # TODO: optimize for static segment by removing first two opcodes
     <<-ASM
       @#{index} // push #{segment} #{index}
       D=A
-      @#{segment_symbol(segment)}
+      @#{segment_symbol(segment, index)}
       A=#{offset_calculation}
       D=M
       @SP // push D on to stack
@@ -121,6 +118,9 @@ class CodeWriter
 
   def pop_asm(segment, index)
     case segment
+    when "static"
+      pop_indirect_asm(segment, index, "A")
+
     when "pointer", "temp"
       pop_indirect_asm(segment, index, "A+D")
 
@@ -133,11 +133,11 @@ class CodeWriter
     # pop the top of the stack and store it in segment[index]
     # segment[index] = stack[sp]
     # sp -= 1
-    # TODO: Determine if there is a way to do this without a temp register
+    # TODO: optimize for static segment by removing first two opcodes
     <<-ASM
       @#{index} // pop #{segment} #{index}
       D=A // D = index
-      @#{segment_symbol(segment)} // A = segment
+      @#{segment_symbol(segment, index)} // A = segment
       D=#{offset_calculation} // D = segment pointer + index (address to write top of stack to)
       @R13
       M=D // R13 = address to write top of stack to

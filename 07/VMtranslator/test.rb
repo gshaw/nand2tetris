@@ -8,6 +8,7 @@ assember_path = File.expand_path("../../06/Assembler/Assembler")
   File.expand_path("../StackArithmetic/StackTest/StackTest.vm"),
   File.expand_path("../MemoryAccess/BasicTest/BasicTest.vm"),
   File.expand_path("../MemoryAccess/PointerTest/PointerTest.vm"),
+  File.expand_path("../MemoryAccess/StaticTest/StaticTest.vm"),
 ].each do |vm_path|
   puts vm_path
   VMTranslator.new.translate_file(vm_path)
