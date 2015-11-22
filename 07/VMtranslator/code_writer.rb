@@ -11,6 +11,10 @@ class CodeWriter
     output.close
   end
 
+  def write_init
+    # write init_asm
+  end
+
   def write_math(command)
     write math_asm(command)
   end
@@ -23,6 +27,14 @@ class CodeWriter
     write pop_asm(segment, index)
   end
 
+  def write_label(label)
+    write "(#{qualified_label(label)})"
+  end
+
+  def write_if(label)
+    write if_asm(label)
+  end
+
   private
 
   def write(asm)
@@ -30,19 +42,41 @@ class CodeWriter
     output.puts
   end
 
+  def qualified_label(label)
+    ".$#{label}"
+  end
+
+  def init_asm
+    "// init bootstrap goes here"
+  end
+
+  def if_asm(label)
+    # pop stack to D
+    # @label
+    # if neq goto label
+    # else continue
+    <<-ASM
+      @SP // if-goto #{label}
+      AM=M-1
+      D=M // D = popped value from top of stack
+      @#{qualified_label(label)}
+      D;JNE
+    ASM
+  end
+
   def math_asm(command)
     case command
-    when "add" then binary_operation_asm("M+D")
-    when "sub" then binary_operation_asm("M-D")
-    when "and" then binary_operation_asm("M&D")
-    when "or"  then binary_operation_asm("M|D")
+    when "add" then binary_operation_asm(command, "M+D")
+    when "sub" then binary_operation_asm(command, "M-D")
+    when "and" then binary_operation_asm(command, "M&D")
+    when "or"  then binary_operation_asm(command, "M|D")
 
-    when "neg" then unary_operation_asm("-M")
-    when "not" then unary_operation_asm("!M")
+    when "neg" then unary_operation_asm(command, "-M")
+    when "not" then unary_operation_asm(command, "!M")
 
-    when "eq"  then conditional_asm("JEQ")
-    when "lt"  then conditional_asm("JLT")
-    when "gt"  then conditional_asm("JGT")
+    when "eq"  then conditional_asm(command, "JEQ")
+    when "lt"  then conditional_asm(command, "JLT")
+    when "gt"  then conditional_asm(command, "JGT")
     else
       fail "Unknown math command: #{command}"
     end
@@ -173,17 +207,17 @@ class CodeWriter
     ASM
   end
 
-  def unary_operation_asm(calculation)
+  def unary_operation_asm(command, calculation)
     <<-ASM
-      @SP // unary operation #{calculation}
+      @SP // #{command}
       A=M-1
       M=#{calculation}
     ASM
   end
 
-  def binary_operation_asm(calculation)
+  def binary_operation_asm(command, calculation)
     <<-ASM
-      @SP // binary operation #{calculation}
+      @SP // #{command}
       D=M
       AM=D-1
       D=M
@@ -192,11 +226,11 @@ class CodeWriter
     ASM
   end
 
-  def conditional_asm(jump_condition)
+  def conditional_asm(command, jump_condition)
     equal_label = next_local_label
     end_label = next_local_label
     <<-ASM
-      @SP // conditional #{jump_condition}
+      @SP // #{command}
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x

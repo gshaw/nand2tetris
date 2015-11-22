@@ -15,17 +15,28 @@ class Parser
   end
 
   COMMENT_PATTERN = %r{//.*\z}
-  SEGMENT_PATTERN = /(argument|local|static|constant|this|that|pointer|temp)/
 
-  MATH_PATTERN = /\A(?<command>add|sub|and|or|neg|not|eq|lt|gt)\z/
-  PUSH_PATTERN = /\A(?<command>push)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/
-  POP_PATTERN  = /\A(?<command>pop)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/
+  SEGMENT_PATTERN = /(argument|local|static|constant|this|that|pointer|temp)/
+  LABEL_PATTERN = /[a-zA-Z_:\.][0-9a-zA-Z_:\.]*/
+
+  PATTERNS = {
+    c_math:     /\A(?<command>add|sub|and|or|neg|not|eq|lt|gt)\z/,
+    c_push:     /\A(?<command>push)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/,
+    c_pop:      /\A(?<command>pop)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/,
+    c_label:    /\A(?<command>label)\s+(?<arg1>#{LABEL_PATTERN})/,
+    c_goto:     /\A(?<command>goto)\s+(?<arg1>#{LABEL_PATTERN})/,
+    c_if:       /\A(?<command>if\-goto)\s+(?<arg1>#{LABEL_PATTERN})/,
+    c_function: /\A(?<command>function)\s+(?<arg1>#{LABEL_PATTERN})\s+(?<arg2>\d+)\z/,
+    c_call:     /\A(?<command>call)\s+(?<arg1>#{LABEL_PATTERN})\s+(?<arg2>\d+)\z/,
+    c_return:   /\A(?<command>return)/,
+  }
 
   def command_type
     return nil if current_line.empty?
-    @current_match = MATH_PATTERN.match(current_line) and return :c_math
-    @current_match = PUSH_PATTERN.match(current_line) and return :c_push
-    @current_match = POP_PATTERN.match(current_line)  and return :c_pop
+
+    PATTERNS.each_pair do |type, pattern|
+      @current_match = pattern.match(current_line) and return type
+    end
 
     fail "Cannot parse line: #{current_line}"
   end
