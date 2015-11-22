@@ -42,6 +42,7 @@ class CodeWriter
 
   def write(asm)
     output.puts(asm)
+    output.puts
   end
 
   def next_local_label
@@ -50,7 +51,7 @@ class CodeWriter
     local_label
   end
 
-  def segment_symbol(segment, index)
+  def segment_symbol(segment)
     case segment
     when "argument" then "ARG"
     when "local"    then "LCL"
@@ -58,8 +59,6 @@ class CodeWriter
     when "that"     then "THAT"
     when "pointer"  then "R3"
     when "temp"     then "R5"
-    when "constant"
-      index.to_s
 
     when "static"
       address = "#{basename}.#{static_count}"
@@ -71,17 +70,24 @@ class CodeWriter
     end
   end
 
-  def push_constant(value)
+  def push_asm(segment, index)
+    case segment
+    when "constant"
+      push_constant_asm(index)
+
+    when "temp"
+      push_indirect_asm(segment, index, "A+D")
+
+    else
+      push_indirect_asm(segment, index, "M+D")
+    end
+  end
+
+  def push_constant_asm(value)
     # push value onto stack
     <<-ASM
       @#{value} // push constant #{value}
       D=A
-#{push_d_asm}
-    ASM
-  end
-
-  def push_d_asm
-    <<-ASM
       @SP
       A=M
       M=D
@@ -90,76 +96,83 @@ class CodeWriter
     ASM
   end
 
-  def push_asm(segment, index)
-    return push_constant(index) if segment == "constant"
-
+  def push_indirect_asm(segment, index, offset_calculation)
     # push the value at segment[index] onto the stack
     # stack[sp] = segment[index]
     # sp += 1
     <<-ASM
       @#{index} // push #{segment} #{index}
       D=A
-      @#{segment_symbol(segment, index)}
+      @#{segment_symbol(segment)}
       A=M+D
       D=M
-#{push_d_asm}
+      @SP // push D on to stack
+      A=M
+      M=D
+      @SP
+      M=M+1
     ASM
   end
 
   def pop_asm(segment, index)
+    if segment == "temp"
+      pop_indirect_asm(segment, index, "A+D")
+    else
+      pop_indirect_asm(segment, index, "M+D")
+    end
+  end
+
+  def pop_indirect_asm(segment, index, offset_calculation)
     # pop the top of the stack and store it in segment[index]
     # segment[index] = stack[sp]
     # sp -= 1
     # TODO: Determine if there is a way to do this without a temp register
     <<-ASM
       @#{index} // pop #{segment} #{index}
-      D=A
-      @#{segment_symbol(segment, index)}
-      D=M+D
+      D=A // D = index
+      @#{segment_symbol(segment)} // A = segment
+      D=#{offset_calculation} // D = segment pointer + index (address to write top of stack to)
       @R13
-      M=D
-      @SP // read value from stack into D
-      A=M
-      D=M   // read top of stack into D
-      M=M-1 // dec stack pointer
+      M=D // R13 = address to write top of stack to
+      @SP // read top of stack into D
+      AM=M-1 // dec SP
+      D=M // top of stack into D
       @R13 // write D (top of stack) to address in R13
       A=M
       M=D
-
     ASM
   end
 
-  def unary_operation_asm(operation)
+  def unary_operation_asm(calculation)
     <<-ASM
-      @SP // unary operation #{operation}
+      @SP // unary operation #{calculation}
       A=M-1
-      M=#{operation}
+      M=#{calculation}
     ASM
   end
 
-  def binary_operation_asm(operation)
+  def binary_operation_asm(calculation)
     <<-ASM
-      @SP // binary operation #{operation}
+      @SP // binary operation #{calculation}
       D=M
       AM=D-1
       D=M
       A=A-1
-      M=#{operation}
-
+      M=#{calculation}
     ASM
   end
 
-  def conditional_asm(conditional_jump_instruction)
+  def conditional_asm(jump_condition)
     equal_label = next_local_label
     end_label = next_local_label
     <<-ASM
-      @SP // conditional #{conditional_jump_instruction}
+      @SP // conditional #{jump_condition}
       AM=M-1 // dec SP
       D=M    // d = y
       A=A-1  // a -> x
       D=M-D  // d = x - y
       @#{equal_label}
-      D;#{conditional_jump_instruction}
+      D;#{jump_condition}
       D=0
       @#{end_label}
       0;JMP
@@ -169,7 +182,6 @@ class CodeWriter
       @SP
       A=M-1
       M=D
-
     ASM
   end
 end

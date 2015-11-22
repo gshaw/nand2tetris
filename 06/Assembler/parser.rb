@@ -18,7 +18,7 @@ class Parser
   COMMENT_PATTERN = %r{//.*\z}
 
   DEST_PATTERN    = /A|AD|AM|ADM|AMD|D|DA|DM|DAM|DMA|M|MA|MD|MAD|MDA/
-  COMP_A0_PATTERN = /0|1|-1|[AD]|\![AD]|-[AD]|[AD]\+1|[AD]-1|D\+A|A+D|A-D|D-A|A&D|D&A|D\|A|A\|D/
+  COMP_A0_PATTERN = /0|1|-1|[AD]|\![AD]|-[AD]|[AD]\+1|[AD]-1|D\+A|A\+D|A-D|D-A|A&D|D&A|D\|A|A\|D/
   COMP_A1_PATTERN = /M|\!M|-M|M\+1|M-1|D\+M|M\+D|D-M|M-D|D&M|M&D|D\|M|M\|D/
   JUMP_PATTERN    = /J(GT|EQ|GE|LT|NE|LE|MP)/
 

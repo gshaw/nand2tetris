@@ -344,6 +344,7 @@
       @SP // unary operation -M
       A=M-1
       M=-M
+
       @SP // binary operation M&D
       D=M
       AM=D-1
@@ -369,3 +370,4 @@
       @SP // unary operation !M
       A=M-1
       M=!M
+
