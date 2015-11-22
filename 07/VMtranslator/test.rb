@@ -5,7 +5,7 @@ assember_path = File.expand_path("../../06/Assembler/Assembler")
 
 [
   File.expand_path("../StackArithmetic/SimpleAdd/SimpleAdd.vm"),
-  # File.expand_path("../StackArithmetic/StackTest/StackTest.vm"),
+  File.expand_path("../StackArithmetic/StackTest/StackTest.vm"),
   # ["../MemoryAccess/BasicTest", "BasicTest.vm"],
 ].each do |vm_path|
   puts vm_path

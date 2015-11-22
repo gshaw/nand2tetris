@@ -17,7 +17,7 @@ class Parser
   COMMENT_PATTERN = %r{//.*\z}
   SEGMENT_PATTERN = /(argument|local|static|constant|this|that|pointer|temp)/
 
-  MATH_PATTERN = /\A(?<command>add|sub)\z/
+  MATH_PATTERN = /\A(?<command>add|sub|and|or|neg|not|eq|lt|gt)\z/
   PUSH_PATTERN = /\A(?<command>push)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/
   POP_PATTERN  = /\A(?<command>pop)\s+(?<arg1>#{SEGMENT_PATTERN})\s+(?<arg2>\d+)\z/
 

@@ -6,6 +6,7 @@ class CodeWriter
     @basename = File.basename(path, ".vm")
     @output = File.open(path, "w")
     @static_count = 0
+    @local_label_count = 0
   end
 
   def close
@@ -14,8 +15,17 @@ class CodeWriter
 
   def write_math(command)
     write case command
-    when "add" then add_asm
-    when "sub" then sub_asm
+    when "add" then binary_operation_asm("M+D")
+    when "sub" then binary_operation_asm("M-D")
+    when "and" then binary_operation_asm("M&D")
+    when "or"  then binary_operation_asm("M|D")
+
+    when "neg" then unary_operation_asm("-M")
+    when "not" then unary_operation_asm("!M")
+
+    when "eq"  then conditional_asm("JEQ")
+    when "lt"  then conditional_asm("JLT")
+    when "gt"  then conditional_asm("JGT")
     else
       fail "Unknown math command: #{command}"
     end
@@ -34,7 +44,13 @@ class CodeWriter
     output.puts(asm)
   end
 
-  def segment_address(segment, index)
+  def next_local_label
+    local_label = "$L#{@local_label_count}"
+    @local_label_count += 1
+    local_label
+  end
+
+  def segment_symbol(segment, index)
     case segment
     when "argument" then "ARG"
     when "local"    then "LCL"
@@ -58,9 +74,9 @@ class CodeWriter
   def push_constant(value)
     # push value onto stack
     <<-ASM
-      @#{value}
+      @#{value} // push constant #{value}
       D=A
-      #{push_d_asm}
+#{push_d_asm}
     ASM
   end
 
@@ -81,13 +97,12 @@ class CodeWriter
     # stack[sp] = segment[index]
     # sp += 1
     <<-ASM
-      @#{index}
+      @#{index} // push #{segment} #{index}
       D=A
-      @#{segment_address(segment, index)}
+      @#{segment_symbol(segment, index)}
       A=M+D
       D=M
-
-      #{push_d_asm}
+#{push_d_asm}
     ASM
   end
 
@@ -95,50 +110,66 @@ class CodeWriter
     # pop the top of the stack and store it in segment[index]
     # segment[index] = stack[sp]
     # sp -= 1
+    # TODO: Determine if there is a way to do this without a temp register
     <<-ASM
-      // save desination pointer in R13
-      @#{index}
+      @#{index} // pop #{segment} #{index}
       D=A
-      @#{segment_address(segment, index)}
+      @#{segment_symbol(segment, index)}
       D=M+D
       @R13
       M=D
-      // read value from stack into D
-      @SP
+      @SP // read value from stack into D
       A=M
-      D=M
-      // write value from stack at address in R13
-      @R13
+      D=M   // read top of stack into D
+      M=M-1 // dec stack pointer
+      @R13 // write D (top of stack) to address in R13
       A=M
-      D=M
-      // dec stack pointer
-      @SP
-      D=M
-      M=D-1
+      M=D
 
     ASM
   end
 
-  def add_asm
-    # pop, pop, push 1
+  def unary_operation_asm(operation)
     <<-ASM
-      @SP
-      D=M
-      AM=D-1
-      D=M
-      A=A-1
-      M=M+D
+      @SP // unary operation #{operation}
+      A=M-1
+      M=#{operation}
     ASM
   end
 
-  def sub_asm
+  def binary_operation_asm(operation)
     <<-ASM
-      @SP
+      @SP // binary operation #{operation}
       D=M
       AM=D-1
       D=M
       A=A-1
-      M=M-D
+      M=#{operation}
+
+    ASM
+  end
+
+  def conditional_asm(conditional_jump_instruction)
+    equal_label = next_local_label
+    end_label = next_local_label
+    <<-ASM
+      @SP // conditional #{conditional_jump_instruction}
+      AM=M-1 // dec SP
+      D=M    // d = y
+      A=A-1  // a -> x
+      D=M-D  // d = x - y
+      @#{equal_label}
+      D;#{conditional_jump_instruction}
+      D=0
+      @#{end_label}
+      0;JMP
+    (#{equal_label})
+      D=-1
+    (#{end_label})
+      @SP
+      A=M-1
+      M=D
+
     ASM
   end
 end

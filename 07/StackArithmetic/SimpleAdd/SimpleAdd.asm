@@ -1,5 +1,4 @@
-      // push constant 7
-      @7
+      @7 // push constant 7
       D=A
       @SP
       A=M
@@ -7,8 +6,7 @@
       @SP
       M=M+1
 
-      // push constant 8
-      @8
+      @8 // push constant 8
       D=A
       @SP
       A=M
@@ -16,10 +14,10 @@
       @SP
       M=M+1
 
-      // M+D
-      @SP
+      @SP // binary operation M+D
       D=M
       AM=D-1
       D=M
       A=A-1
       M=M+D
+
