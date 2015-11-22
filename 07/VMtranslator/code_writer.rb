@@ -35,6 +35,10 @@ class CodeWriter
     write if_asm(label)
   end
 
+  def write_goto(label)
+    write goto_asm(label)
+  end
+
   private
 
   def write(asm)
@@ -61,6 +65,13 @@ class CodeWriter
       D=M // D = popped value from top of stack
       @#{qualified_label(label)}
       D;JNE
+    ASM
+  end
+
+  def goto_asm(label)
+    <<-ASM
+      @#{qualified_label(label)} // goto #{label}
+      0;JMP
     ASM
   end
 
