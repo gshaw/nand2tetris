@@ -11,13 +11,14 @@ class VMTranslator
   end
 
   def translate_directory(directory_path)
-    output_path = directory_path + ".asm"
+    output_path = "#{directory_path}/#{File.basename(directory_path)}.asm"
     code_writer = CodeWriter.new(output_path)
     code_writer.write_init
     Dir.glob("#{directory_path}/*.vm").each do |input_path|
       generate(input_path, code_writer)
     end
     code_writer.close
+    output_path
   end
 
   def translate_file(input_path)
@@ -26,6 +27,7 @@ class VMTranslator
     code_writer.write_init
     generate(input_path, code_writer)
     code_writer.close
+    output_path
   end
 
   def generate(input_path, code_writer)

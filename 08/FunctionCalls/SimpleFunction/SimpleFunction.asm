@@ -1,16 +1,16 @@
 (SimpleFunction.test) // function SimpleFunction.test
-      @0 // push constant 0
-      D=A
-        @SP // arg 0
-        A=M
-        M=D
-        @SP
-        M=M+1
-        @SP // arg 1
-        A=M
-        M=D
-        @SP
-        M=M+1
+        @0 // 2 times push 0
+        D=A
+          @SP // push D
+          A=M
+          M=D
+          @SP
+          M=M+1
+          @SP // push D
+          A=M
+          M=D
+          @SP
+          M=M+1
 
       @0 // push local 0
       D=A
@@ -99,8 +99,6 @@
         @ARG
         A=M
         M=D
-        @999
-        @999
       // SP = ARG+1
         @ARG
         D=M+1

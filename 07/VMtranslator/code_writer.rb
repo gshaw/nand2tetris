@@ -42,7 +42,11 @@ class CodeWriter
 
   def write_function(name, arg_count)
     function_name_stack.push(name)
-    write function_asm(name, arg_count)
+    write function_asm(name, arg_count.to_i)
+  end
+
+  def write_call(name, arg_count)
+    write call_asm(name, arg_count.to_i)
   end
 
   def write_return
@@ -66,21 +70,77 @@ class CodeWriter
   end
 
   def function_asm(name, arg_count)
-    asm = <<-ASM
-(#{name}) // function #{name}
-      @0 // push constant 0
-      D=A
-    ASM
-    arg_count.to_i.times do |index|
+    asm = "(#{name}) // function #{name}\n"
+    if arg_count > 0
       asm << <<-ASM
-        @SP // arg #{index}
-        A=M
-        M=D
-        @SP
-        M=M+1
+        @0 // #{arg_count} times push 0
+        D=A
       ASM
+      arg_count.times do |index|
+        asm << push_d_asm
+      end
     end
     asm
+  end
+
+  def push_d_asm
+    <<-ASM
+          @SP // push D
+          A=M
+          M=D
+          @SP
+          M=M+1
+    ASM
+  end
+
+  def call_asm(name, arg_count)
+    return_label = next_local_label
+    <<-ASM
+      // push (return-address)
+        @#{return_label}
+        D=A
+#{push_d_asm}
+      // push LCL
+        @LCL
+        D=M
+#{push_d_asm}
+      // push ARG
+        @ARG
+        D=M
+#{push_d_asm}
+      // push THIS
+        @THIS
+        D=M
+#{push_d_asm}
+      // push THAT
+        @THAT
+        D=M
+#{push_d_asm}
+      // ARG = SP - arg_count - 5
+        @SP
+        D=M
+        @R13
+        M=D // R13 = SP
+        @#{arg_count}
+        D=A
+        @R13
+        M=M-D // R13 = SP - arg_count
+        @5
+        D=A
+        @R13
+        D=M-D // D = SP - arg_count - 5
+        @ARG
+        M=D // ARG = SP - arg_count - 5
+      // LCL = SP
+        @SP
+        D=M
+        @LCL
+        M=D
+      // goto name
+        @#{name}
+        0;JMP
+(#{return_label}) // (return-address)
+    ASM
   end
 
   def return_asm
@@ -103,8 +163,6 @@ class CodeWriter
         @ARG
         A=M
         M=D
-        @999
-        @999
       // SP = ARG+1
         @ARG
         D=M+1
