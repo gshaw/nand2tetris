@@ -1,11 +1,11 @@
 class CodeWriter
-  attr_reader :basename, :output, :function_name_stack
+  attr_reader :basename, :output
 
   def initialize(path)
     @basename = File.basename(path, ".asm")
     @output = File.open(path, "w")
     @local_label_count = 0
-    @function_name_stack = ["."]
+    @current_function_name = "."
   end
 
   def close
@@ -13,7 +13,7 @@ class CodeWriter
   end
 
   def write_init
-    # write init_asm
+    write init_asm
   end
 
   def write_math(command)
@@ -41,7 +41,7 @@ class CodeWriter
   end
 
   def write_function(name, arg_count)
-    function_name_stack.push(name)
+    @current_function_name = name
     write function_asm(name, arg_count.to_i)
   end
 
@@ -51,7 +51,6 @@ class CodeWriter
 
   def write_return
     write return_asm
-    function_name_stack.pop
   end
 
   private
@@ -62,11 +61,20 @@ class CodeWriter
   end
 
   def label_specification(label)
-    "#{function_name_stack.last}$#{label}"
+    "#{@current_function_name}$#{label}"
   end
 
   def init_asm
-    "// init bootstrap goes here"
+    <<-ASM
+      // init bootstrap
+      @256
+      D=A
+      @SP
+      M=D
+
+      // call Sys.init
+#{call_asm("Sys.init", 0)}
+    ASM
   end
 
   def function_asm(name, arg_count)
