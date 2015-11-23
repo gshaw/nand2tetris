@@ -7,6 +7,7 @@ class CodeWriter
     @local_label_count = 0
     @current_function_name = "."
     @input_path = nil
+    @call_invoked = false
     @return_invoked = false
   end
 
@@ -20,6 +21,7 @@ class CodeWriter
   end
 
   def write_global_methods
+    write global_call_asm if @call_invoked
     write global_return_asm if @return_invoked
   end
 
@@ -53,6 +55,7 @@ class CodeWriter
   end
 
   def write_call(name, arg_count)
+    @call_invoked = true
     write call_asm(name, arg_count.to_i)
   end
 
@@ -109,13 +112,10 @@ class CodeWriter
     ASM
   end
 
-  def call_asm(name, arg_count)
-    return_label = next_local_label
+  # R14 = arg_count, R15 = jump address
+  def global_call_asm
     <<-ASM
-      // push (return-address)
-        @#{return_label}
-        D=A
-#{push_d_asm}
+($$GLOBAL.call)
       // push LCL
         @LCL
         D=M
@@ -137,8 +137,8 @@ class CodeWriter
         D=M
         @R13
         M=D // R13 = SP
-        @#{arg_count}
-        D=A
+        @R14
+        D=M
         @R13
         M=M-D // R13 = SP - arg_count
         @5
@@ -153,8 +153,38 @@ class CodeWriter
         @LCL
         M=D
       // goto name
-        @#{name}
+        @R15
+        A=M
         0;JMP
+    ASM
+  end
+
+  # Use global call, R14 = arg_count, R15 = call address
+  def call_asm(name, arg_count)
+    return_label = next_local_label
+    <<-ASM
+      // store arg_count in R14
+        @#{arg_count}
+        D=A
+        @R14
+        M=D
+
+      // store jump address in R15
+        @#{name}
+        D=A
+        @R15
+        M=D
+
+      // push (return-address)
+        @#{return_label}
+        D=A
+#{push_d_asm}
+
+      // call global call method
+        @9999
+        @$$GLOBAL.call
+        0;JMP
+
 (#{return_label}) // (return-address)
     ASM
   end

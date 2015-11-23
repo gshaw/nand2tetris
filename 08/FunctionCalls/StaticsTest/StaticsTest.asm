@@ -5,6 +5,18 @@
       M=D
 
       // call Sys.init
+      // store arg_count in R14
+        @0
+        D=A
+        @R14
+        M=D
+
+      // store jump address in R15
+        @Sys.init
+        D=A
+        @R15
+        M=D
+
       // push (return-address)
         @$L0
         D=A
@@ -14,65 +26,12 @@
           @SP
           M=M+1
 
-      // push LCL
-        @LCL
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
 
-      // push ARG
-        @ARG
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THIS
-        @THIS
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THAT
-        @THAT
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // ARG = SP - arg_count - 5
-        @SP
-        D=M
-        @R13
-        M=D // R13 = SP
-        @0
-        D=A
-        @R13
-        M=M-D // R13 = SP - arg_count
-        @5
-        D=A
-        @R13
-        D=M-D // D = SP - arg_count - 5
-        @ARG
-        M=D // ARG = SP - arg_count - 5
-      // LCL = SP
-        @SP
-        D=M
-        @LCL
-        M=D
-      // goto name
-        @Sys.init
+      // call global call method
+        @9999
+        @$$GLOBAL.call
         0;JMP
+
 ($L0) // (return-address)
 
 
@@ -292,6 +251,18 @@
       @SP
       M=M+1
 
+      // store arg_count in R14
+        @2
+        D=A
+        @R14
+        M=D
+
+      // store jump address in R15
+        @Class1.set
+        D=A
+        @R15
+        M=D
+
       // push (return-address)
         @$L1
         D=A
@@ -301,65 +272,12 @@
           @SP
           M=M+1
 
-      // push LCL
-        @LCL
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
 
-      // push ARG
-        @ARG
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THIS
-        @THIS
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THAT
-        @THAT
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // ARG = SP - arg_count - 5
-        @SP
-        D=M
-        @R13
-        M=D // R13 = SP
-        @2
-        D=A
-        @R13
-        M=M-D // R13 = SP - arg_count
-        @5
-        D=A
-        @R13
-        D=M-D // D = SP - arg_count - 5
-        @ARG
-        M=D // ARG = SP - arg_count - 5
-      // LCL = SP
-        @SP
-        D=M
-        @LCL
-        M=D
-      // goto name
-        @Class1.set
+      // call global call method
+        @9999
+        @$$GLOBAL.call
         0;JMP
+
 ($L1) // (return-address)
 
       @0 // pop temp 0
@@ -391,6 +309,18 @@
       @SP
       M=M+1
 
+      // store arg_count in R14
+        @2
+        D=A
+        @R14
+        M=D
+
+      // store jump address in R15
+        @Class2.set
+        D=A
+        @R15
+        M=D
+
       // push (return-address)
         @$L2
         D=A
@@ -400,65 +330,12 @@
           @SP
           M=M+1
 
-      // push LCL
-        @LCL
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
 
-      // push ARG
-        @ARG
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THIS
-        @THIS
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // push THAT
-        @THAT
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // ARG = SP - arg_count - 5
-        @SP
-        D=M
-        @R13
-        M=D // R13 = SP
-        @2
-        D=A
-        @R13
-        M=M-D // R13 = SP - arg_count
-        @5
-        D=A
-        @R13
-        D=M-D // D = SP - arg_count - 5
-        @ARG
-        M=D // ARG = SP - arg_count - 5
-      // LCL = SP
-        @SP
-        D=M
-        @LCL
-        M=D
-      // goto name
-        @Class2.set
+      // call global call method
+        @9999
+        @$$GLOBAL.call
         0;JMP
+
 ($L2) // (return-address)
 
       @0 // pop temp 0
@@ -474,6 +351,18 @@
       A=M
       M=D
 
+      // store arg_count in R14
+        @0
+        D=A
+        @R14
+        M=D
+
+      // store jump address in R15
+        @Class1.get
+        D=A
+        @R15
+        M=D
+
       // push (return-address)
         @$L3
         D=A
@@ -483,66 +372,25 @@
           @SP
           M=M+1
 
-      // push LCL
-        @LCL
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
 
-      // push ARG
-        @ARG
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
+      // call global call method
+        @9999
+        @$$GLOBAL.call
+        0;JMP
 
-      // push THIS
-        @THIS
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
+($L3) // (return-address)
 
-      // push THAT
-        @THAT
-        D=M
-          @SP // push D
-          A=M
-          M=D
-          @SP
-          M=M+1
-
-      // ARG = SP - arg_count - 5
-        @SP
-        D=M
-        @R13
-        M=D // R13 = SP
+      // store arg_count in R14
         @0
         D=A
-        @R13
-        M=M-D // R13 = SP - arg_count
-        @5
-        D=A
-        @R13
-        D=M-D // D = SP - arg_count - 5
-        @ARG
-        M=D // ARG = SP - arg_count - 5
-      // LCL = SP
-        @SP
-        D=M
-        @LCL
+        @R14
         M=D
-      // goto name
-        @Class1.get
-        0;JMP
-($L3) // (return-address)
+
+      // store jump address in R15
+        @Class2.get
+        D=A
+        @R15
+        M=D
 
       // push (return-address)
         @$L4
@@ -553,6 +401,20 @@
           @SP
           M=M+1
 
+
+      // call global call method
+        @9999
+        @$$GLOBAL.call
+        0;JMP
+
+($L4) // (return-address)
+
+(Sys.init$WHILE)
+
+      @Sys.init$WHILE // goto WHILE
+      0;JMP
+
+($$GLOBAL.call)
       // push LCL
         @LCL
         D=M
@@ -594,8 +456,8 @@
         D=M
         @R13
         M=D // R13 = SP
-        @0
-        D=A
+        @R14
+        D=M
         @R13
         M=M-D // R13 = SP - arg_count
         @5
@@ -610,14 +472,9 @@
         @LCL
         M=D
       // goto name
-        @Class2.get
+        @R15
+        A=M
         0;JMP
-($L4) // (return-address)
-
-(Sys.init$WHILE)
-
-      @Sys.init$WHILE // goto WHILE
-      0;JMP
 
 ($$GLOBAL.return)
       // *ARG = pop()
