@@ -7,14 +7,20 @@ class CodeWriter
     @local_label_count = 0
     @current_function_name = "."
     @input_path = nil
+    @return_invoked = false
   end
 
   def close
+    write_global_methods
     output.close
   end
 
   def write_init
     write init_asm
+  end
+
+  def write_global_methods
+    write global_return_asm if @return_invoked
   end
 
   def write_math(command)
@@ -51,6 +57,7 @@ class CodeWriter
   end
 
   def write_return
+    @return_invoked = true
     write return_asm
   end
 
@@ -152,6 +159,8 @@ class CodeWriter
     ASM
   end
 
+  # Uses global return function to save on ROM space.
+  # Requires FRAME in R13 and RET in R14
   def return_asm
     <<-ASM
       // FRAME = LCL (save FRAME in R13)
@@ -165,6 +174,17 @@ class CodeWriter
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
+
+        @$$GLOBAL.return
+        0;JMP
+    ASM
+  end
+
+  # Implement return operation as a global function to reduce ROM size at the cost of extra instructions.
+  # FRAME in R13 and RET in R14
+  def global_return_asm
+    <<-ASM
+($$GLOBAL.return)
       // *ARG = pop()
         @SP
         AM=M-1 // dec SP

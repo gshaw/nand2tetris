@@ -92,6 +92,11 @@
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
+
+        @$$GLOBAL.return
+        0;JMP
+
+($$GLOBAL.return)
       // *ARG = pop()
         @SP
         AM=M-1 // dec SP

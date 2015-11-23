@@ -131,53 +131,8 @@
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
-      // *ARG = pop()
-        @SP
-        AM=M-1 // dec SP
-        D=M // top of stack into D
-        @ARG
-        A=M
-        M=D
-      // SP = ARG+1
-        @ARG
-        D=M+1
-        @SP
-        M=D
-      // THAT = *(FRAME-1)
-        @1
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THAT
-        M=D
-      // THIS = *(FRAME-2)
-        @2
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THIS
-        M=D
-      // ARG = *(FRAME-3)
-        @3
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @ARG
-        M=D
-      // LCL = *(FRAME-4)
-        @4
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @LCL
-        M=D
-      // goto RET
-        @R14
-        A=M
+
+        @$$GLOBAL.return
         0;JMP
 
 (Class1.get) // function Class1.get
@@ -216,53 +171,8 @@
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
-      // *ARG = pop()
-        @SP
-        AM=M-1 // dec SP
-        D=M // top of stack into D
-        @ARG
-        A=M
-        M=D
-      // SP = ARG+1
-        @ARG
-        D=M+1
-        @SP
-        M=D
-      // THAT = *(FRAME-1)
-        @1
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THAT
-        M=D
-      // THIS = *(FRAME-2)
-        @2
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THIS
-        M=D
-      // ARG = *(FRAME-3)
-        @3
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @ARG
-        M=D
-      // LCL = *(FRAME-4)
-        @4
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @LCL
-        M=D
-      // goto RET
-        @R14
-        A=M
+
+        @$$GLOBAL.return
         0;JMP
 
 (Class2.set) // function Class2.set
@@ -320,53 +230,8 @@
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
-      // *ARG = pop()
-        @SP
-        AM=M-1 // dec SP
-        D=M // top of stack into D
-        @ARG
-        A=M
-        M=D
-      // SP = ARG+1
-        @ARG
-        D=M+1
-        @SP
-        M=D
-      // THAT = *(FRAME-1)
-        @1
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THAT
-        M=D
-      // THIS = *(FRAME-2)
-        @2
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THIS
-        M=D
-      // ARG = *(FRAME-3)
-        @3
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @ARG
-        M=D
-      // LCL = *(FRAME-4)
-        @4
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @LCL
-        M=D
-      // goto RET
-        @R14
-        A=M
+
+        @$$GLOBAL.return
         0;JMP
 
 (Class2.get) // function Class2.get
@@ -405,53 +270,8 @@
         D=M // D = *(FRAME-5)
         @R14
         M=D // R14 = RET
-      // *ARG = pop()
-        @SP
-        AM=M-1 // dec SP
-        D=M // top of stack into D
-        @ARG
-        A=M
-        M=D
-      // SP = ARG+1
-        @ARG
-        D=M+1
-        @SP
-        M=D
-      // THAT = *(FRAME-1)
-        @1
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THAT
-        M=D
-      // THIS = *(FRAME-2)
-        @2
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @THIS
-        M=D
-      // ARG = *(FRAME-3)
-        @3
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @ARG
-        M=D
-      // LCL = *(FRAME-4)
-        @4
-        D=A
-        @R13
-        A=M-D
-        D=M
-        @LCL
-        M=D
-      // goto RET
-        @R14
-        A=M
+
+        @$$GLOBAL.return
         0;JMP
 
 (Sys.init) // function Sys.init
@@ -798,4 +618,54 @@
 
       @Sys.init$WHILE // goto WHILE
       0;JMP
+
+($$GLOBAL.return)
+      // *ARG = pop()
+        @SP
+        AM=M-1 // dec SP
+        D=M // top of stack into D
+        @ARG
+        A=M
+        M=D
+      // SP = ARG+1
+        @ARG
+        D=M+1
+        @SP
+        M=D
+      // THAT = *(FRAME-1)
+        @1
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @THAT
+        M=D
+      // THIS = *(FRAME-2)
+        @2
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @THIS
+        M=D
+      // ARG = *(FRAME-3)
+        @3
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @ARG
+        M=D
+      // LCL = *(FRAME-4)
+        @4
+        D=A
+        @R13
+        A=M-D
+        D=M
+        @LCL
+        M=D
+      // goto RET
+        @R14
+        A=M
+        0;JMP
 
