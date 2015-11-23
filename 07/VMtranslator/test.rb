@@ -25,5 +25,5 @@ NON_BOOTSTRAP_MODULES = [
 
 BOOTSTRAP_MODULES = [
   File.expand_path("../../08/FunctionCalls/FibonacciElement"),
-  # File.expand_path("../../08/FunctionCalls/StaticsTest"),
+  File.expand_path("../../08/FunctionCalls/StaticsTest"),
 ].each { |vm_path| translate(vm_path, bootstrap: true) }

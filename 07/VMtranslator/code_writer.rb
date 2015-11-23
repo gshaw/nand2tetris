@@ -1,11 +1,12 @@
 class CodeWriter
   attr_reader :basename, :output
+  attr_accessor :input_path
 
-  def initialize(path)
-    @basename = File.basename(path, ".asm")
-    @output = File.open(path, "w")
+  def initialize(output_path)
+    @output = File.open(output_path, "w")
     @local_label_count = 0
     @current_function_name = "."
+    @input_path = nil
   end
 
   def close
@@ -268,10 +269,15 @@ class CodeWriter
     when "that"     then "THAT"
     when "pointer"  then "R3"
     when "temp"     then "R5"
-    when "static"   then "#{basename}.#{index}"
+    when "static"   then "#{static_segment_symbol(index)}"
     else
       fail "Unknown segment #{segment}"
     end
+  end
+
+  def static_segment_symbol(index)
+    basename = File.basename(input_path, ".vm")
+    "#{basename}.#{index}"
   end
 
   def push_asm(segment, index)
